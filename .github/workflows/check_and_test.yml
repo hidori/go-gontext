@@ -16,4 +16,3 @@ jobs:
       with:
         version: latest
     - run: make test
-    - run: make container/build
