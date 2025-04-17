@@ -15,47 +15,41 @@ package main
 
 import (
  "context"
- "fmt"
- "time"
 
  "github.com/hidori/go-gontext"
 )
 
+type contextKey string
+
+const (
+ key1 contextKey = "key1"
+ key2 contextKey = "key2"
+ key3 contextKey = "key3"
+)
+
 func main() {
- production()
- test()
- production()
- test()
-}
-
-func production() {
  ctx := context.Background()
- ctx = contexttime.SetDefaultTime(ctx)
 
- fmt.Println(contexttime.GetTime(ctx).Now())
-}
+ ctx = context.WithValue(ctx, key1, "value")
+ value, ok := gontext.Value[string](ctx, key1)
+ if ok {
+  println("Value:", value)
+ } else {
+  println("Key not found")
+ }
 
-var _ = contexttime.Time((*MockTime)(nil))
+ defaultValue := gontext.ValueOrDefault(ctx, key2, "default")
+ println("Default Value:", defaultValue)
 
-type MockTime struct{}
-
-func (t *MockTime) Now() time.Time {
- return time.Date(2025, 2, 21, 12, 34, 56, 789, time.UTC)
-}
-
-func test() {
- ctx := context.Background()
- ctx = contexttime.SetTime(ctx, &MockTime{})
-
- fmt.Println(contexttime.GetTime(ctx).Now())
+ zeroValue := gontext.ValueOrZero[int](ctx, key3)
+ println("Zero Value:", zeroValue)
 }
 ```
 
 OUTPUT:
 
 ```text
-2025-02-26 01:36:57.317319169 +0900 JST m=+0.000065680
-2025-02-21 12:34:56.000000789 +0000 UTC
-2025-02-26 01:36:57.317429996 +0900 JST m=+0.000176489
-2025-02-21 12:34:56.000000789 +0000 UTC
+Value: value
+Default Value: default
+Zero Value: 0
 ```
